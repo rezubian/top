@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My App</title>
+    <link rel="stylesheet" href="styles.css">
+
+  </head>
+  <body>
+    <h1>Hello, world!</h1>
+
+    <button id="input_type">wasd</button>
+
+    <div id="position"></div>
+  </body>
+  <script src="https://unpkg.com/pixi.js@7.x/dist/pixi.min.js"></script>
+    
+  
+
+  
+<script>
+
+//as a client to connect to the server at ws://localhost:8888
+const ws = new WebSocket("ws://198.8.59.66:9999/");
+
+const Application = PIXI.Application;
+const Sprite = PIXI.Sprite;
+const Loader = PIXI.Loader;
+
+
+ 
+//create a new pixi application
+
+const apple = new Application({
+    width: 800,
+    height: 600,
+    backgroundColor: 0x1099bb
+});
+
+
+//add the canvas that pixi automatically created for you to the html document
+document.body.appendChild(apple.view);
+
+
+
+
+
+
+
+let players = {};
+
+//listen for messages from the server
+ws.addEventListener("message", (event) => {
+    //parse the message
+    const data = JSON.parse(event.data);
+    //update the player's position in the players object
+    players[data.id] = data;
+
+    // fill the screen with the background color
+    apple.stage.removeChildren();
+    
+
+    //draw the players on the screen
+    for (const id in players) {
+
+
+        const player = players[id];
+        
+        
+        
+        const square = new PIXI.Graphics();
+        square.beginFill(0xFF0000);
+        square.drawRect(0, 0, 100, 100);
+        square.endFill();
+        square.x = player.x;
+        square.y = player.y;
+        apple.stage.addChild(square);
+    }
+
+
+});
+
+const input = document.getElementById("input_type");
+let input_type = "wasd";
+
+
+
+// add an event listener to the button that will change the input type
+
+input.addEventListener("click", () => {
+    if (input_type === "wasd") {
+        input_type = "arrow";
+        input.textContent = "arrow";
+    } else {
+        input_type = "wasd";
+        input.textContent = "wasd";
+    }
+});
+
+
+let move = [];
+
+
+document.addEventListener("keydown", (event) => {
+    console.log(event.keyCode);
+
+    if (document.hasFocus()) {
+    
+    if (input_type === "wasd") {
+        switch (event.keyCode) {
+            case 87:
+                if (move.includes("up")) {
+                    return;
+                }
+                move.push("up");
+                break;
+            case 83:
+                if (move.includes("down")) {
+                    return;
+                }
+                move.push("down");
+                break;
+            case 65:
+                if (move.includes("left")) {
+                    return;
+                }
+                move.push("left");
+                break;
+            case 68:
+                if (move.includes("right")) {
+                    return;
+                }
+                move.push("right");
+                break;
+        }
+    } else {
+    switch (event.keyCode) {
+        case 38:
+            if (move.includes("up")) {
+                return;
+            }
+            move.push("up");
+            break;
+        case 40:
+            if (move.includes("down")) {
+                return;
+            }
+            move.push("down");
+            break;
+        case 37:
+            if (move.includes("left")) {
+                return;
+            }
+            move.push("left");
+            break;
+        case 39:
+        if (move.includes("right")) {
+                return;
+            }
+            move.push("right");
+            break;
+        }
+
+    }
+    ws.send(JSON.stringify({ move }));
+    }
+});
+
+window.addEventListener("keyup", (event) => {
+    if (input_type === "wasd") {
+        switch (event.keyCode) {
+            case 87:
+                move = move.filter((m) => m !== "up");
+                break;
+            case 83:
+                move = move.filter((m) => m !== "down");
+                break;
+            case 65:
+                move = move.filter((m) => m !== "left");
+                break;
+            case 68:
+                move = move.filter((m) => m !== "right");
+                break;
+        }
+    } else {
+    switch (event.key) {
+        case "ArrowUp":
+            move = move.filter((m) => m !== "up");
+            break;
+        case "ArrowDown":
+            move = move.filter((m) => m !== "down");
+            break;
+        case "ArrowLeft":
+            move = move.filter((m) => m !== "left");
+            break;
+        case "ArrowRight":
+            move = move.filter((m) => m !== "right");
+            break;
+    }
+}
+    ws.send(JSON.stringify({ move }));
+});
+
+// //make 4 buttons that will send a message to the server when clicked for up, down, left, and right
+// const up = document.getElementById("up");
+// const down = document.getElementById("down");
+// const left = document.getElementById("left");
+// const right = document.getElementById("right");
+
+
+
+// up.addEventListener("click", () => {
+//     //send json that has data.move = ["up"]
+//     ws.send(JSON.stringify({ move: ["up"] }));
+
+// });
+
+// down.addEventListener("click", () => {
+//     //send json that has data.move = ["down"]
+//     ws.send(JSON.stringify({ move: ["down"] }));
+// });
+
+// left.addEventListener("click", () => {
+//     //send json that has data.move = ["left"]
+//     ws.send(JSON.stringify({ move: ["left"] }));
+// });
+
+
+// right.addEventListener("click", () => {
+//     //send json that has data.move = ["right"]
+//     ws.send(JSON.stringify({ move: ["right"] }));
+// });
+</script>
+
+
+</html>
