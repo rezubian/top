@@ -20,7 +20,7 @@
 <script>
 
 //as a client to connect to the server at ws://localhost:8888
-const ws = new WebSocket("ws://198.8.59.66:9999/");
+const ws = new WebSocket("ws://localhost:9999/");
 
 const Application = PIXI.Application;
 const Sprite = PIXI.Sprite;
@@ -55,26 +55,7 @@ ws.addEventListener("message", (event) => {
     //update the player's position in the players object
     players[data.id] = data;
 
-    // fill the screen with the background color
-    apple.stage.removeChildren();
-    
 
-    //draw the players on the screen
-    for (const id in players) {
-
-
-        const player = players[id];
-        
-        
-        
-        const square = new PIXI.Graphics();
-        square.beginFill(0xFF0000);
-        square.drawRect(0, 0, 100, 100);
-        square.endFill();
-        square.x = player.x;
-        square.y = player.y;
-        apple.stage.addChild(square);
-    }
 
 
 });
@@ -200,35 +181,50 @@ window.addEventListener("keyup", (event) => {
     ws.send(JSON.stringify({ move }));
 });
 
-// //make 4 buttons that will send a message to the server when clicked for up, down, left, and right
-// const up = document.getElementById("up");
-// const down = document.getElementById("down");
-// const left = document.getElementById("left");
-// const right = document.getElementById("right");
+
+function moveLoop() {
+    // foreach player in the players object
+    for (const id in players) {
+        const player = players[id];
+        //foreach move in the player's move array
+        player.x += player.velocity[0] * player.speed * 1/120;
+        player.y += player.velocity[1] * player.speed * 1/120;
+    }
+    
+
+}
+
+// every 1/120th run moveLoop
 
 
+function gameLoop() {
+    //loop through the players object
+    apple.stage.removeChildren();
+    
 
-// up.addEventListener("click", () => {
-//     //send json that has data.move = ["up"]
-//     ws.send(JSON.stringify({ move: ["up"] }));
-
-// });
-
-// down.addEventListener("click", () => {
-//     //send json that has data.move = ["down"]
-//     ws.send(JSON.stringify({ move: ["down"] }));
-// });
-
-// left.addEventListener("click", () => {
-//     //send json that has data.move = ["left"]
-//     ws.send(JSON.stringify({ move: ["left"] }));
-// });
+    //draw the players on the screen
+    for (const id in players) {
 
 
-// right.addEventListener("click", () => {
-//     //send json that has data.move = ["right"]
-//     ws.send(JSON.stringify({ move: ["right"] }));
-// });
+        const player = players[id];
+        
+        
+        
+        const square = new PIXI.Graphics();
+        square.beginFill(0xFF0000);
+        square.drawRect(0, 0, 100, 100);
+        square.endFill();
+        square.x = player.x;
+        square.y = player.y;
+        apple.stage.addChild(square);
+    }
+}
+
+//every 1/60th of a second run gameLoop
+setInterval(moveLoop, 1000 / 120);
+setInterval(gameLoop, 1000 / 120);
+
+
 </script>
 
 
