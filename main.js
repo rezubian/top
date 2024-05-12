@@ -1,7 +1,7 @@
 
 
 
-const ws = new WebSocket("wss://rezubian.top/wss");
+const ws = new WebSocket("wss://localhost:9999/wss");
 
 
 
@@ -106,6 +106,8 @@ window.addEventListener("keyup", (event) => {
 });
 
 
+let bounds = [11, 10, 789, 575];
+
 function moveLoop() {
     console.log(move)
     // foreach player in the players object
@@ -114,9 +116,20 @@ function moveLoop() {
         //foreach move in the player's move array
         player.x += player.velocity[0] * player.speed * 1/120;
         player.y += player.velocity[1] * player.speed * 1/120;
+        if (player.x < bounds[0]) {
+            player.x = bounds[0];
+        }
+        if (player.y < bounds[1]) {
+            player.y = bounds[1];
+        }
+        if (player.x > bounds[2]) {
+            player.x = bounds[2];
+        }
+        if (player.y > bounds[3]) {
+            player.y = bounds[3];
+        }
     }
     
-
 }
 
 function killLoop() {
