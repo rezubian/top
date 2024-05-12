@@ -1,8 +1,7 @@
 
 
 
-const ws = new WebSocket("wss://localhost:9999/wss");
-
+const ws = new WebSocket("wss://rezubian.top/wss");
 
 
 
