@@ -1,0 +1,24 @@
+name: docker
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ezrizhu
+        password: ${{ secrets.CI_TOKEN }}
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v4
+      with:
+        push: true
+        tags: |
+          ghcr.io/rezubian/top:${{ github.sha }}
+          ghcr.io/rezubian/top:latest
